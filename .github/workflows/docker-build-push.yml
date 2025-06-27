@@ -29,3 +29,15 @@ jobs:
           context: .
           push: true
           tags: koyounggam/heomiverse-fe:latest
+
+      - name: SSH 원격 배포
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ec2-52-79-234-117.ap-northeast-2.compute.amazonaws.com
+          username: ec2-user
+          key: ${{ secrets.KIMZEOLMI_SSH_KEY }}
+          script: |
+            docker pull koyounggam/heomiverse-fe:latest
+            docker stop heomiverse-fe || true
+            docker rm heomiverse-fe || true
+            docker run -d --name heomiverse-fe -p 80:80 --add-host=host.docker.internal:host-gateway koyounggam/heomiverse-fe:latest

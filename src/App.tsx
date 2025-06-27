@@ -135,7 +135,7 @@ function App() {
           </>
         ) : dailyViews >= DAILY_LIMIT ? (
           <p className="text-gray-500 text-center select-none">
-            오늘은 더 이상 볼 수 없어요. 내일 다시 와주세요!
+            오늘은 더 이상 볼 수 없어요 😥 내일 다시 와주세요!
           </p>
         ) : (
           <p className="text-gray-500 text-center select-none">
