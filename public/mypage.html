@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="description" content="허미버스 회원가입">
+  <link rel="icon" href="/icons/icon-32.png" sizes="32x32" />
+  <link rel="apple-touch-icon" href="/icons/icon-180.png" sizes="180x180" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>마이페이지 | 허미버스</title>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center">
+  <div class="w-full max-w-md p-8">
+    <div class="bg-white rounded-lg shadow-lg p-6">
+      <h2 class="text-xl font-bold text-center mb-6">마이페이지</h2>
+      
+      <form id="signupForm" class="space-y-4">
+        <div>
+          <label for="username" class="block text-sm font-medium text-gray-700 mb-1">사용자 이름</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+              <i class="fas fa-user"></i>
+            </span>
+            <input type="text" id="username" name="username" required
+              class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="사용자 이름을 입력하세요" />
+          </div>
+        </div>
+
+        <div>
+          <label for="nickname" class="block text-sm font-medium text-gray-700 mb-1">별명</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+              <i class="fas fa-tag"></i>
+            </span>
+            <input type="text" id="nickname" name="nickname" required
+              class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="별명을 입력하세요" />
+          </div>
+        </div>
+
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700 mb-1">이메일</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+              <i class="fas fa-envelope"></i>
+            </span>
+            <input type="email" id="email" name="email" required
+              class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="이메일을 입력하세요" />
+          </div>
+        </div>
+
+        <button type="button" id="buttonSave"
+          class="w-full py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+          저장
+        </button>
+      </form>
+
+      <div class="mt-6">
+        <div class="relative">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-gray-300"></div>
+          </div>
+          <div class="relative flex justify-center text-sm">
+            <span class="px-2 bg-white text-gray-500">간편 로그인 연결</span>
+          </div>
+        </div>
+
+        <div class="mt-6 space-y-3">
+          <button type="button" id="buttonPasskey"
+            class="w-full inline-flex justify-center items-center py-2.5 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <i class="fas fa-fingerprint text-blue-500 text-lg mr-3"></i> 패스키 연결
+          </button>
+          <button type="button" id="buttonGoogle"
+            class="w-full inline-flex justify-center items-center py-2.5 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <i class="fab fa-google text-red-500 text-lg mr-3"></i> Google 계정 연결
+          </button>
+          <button type="button" id="buttonGithub"
+            class="w-full inline-flex justify-center items-center py-2.5 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <i class="fab fa-github text-gray-800 text-lg mr-3"></i> GitHub 계정 연결
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-8 text-center text-sm text-gray-500">
+      <a href="/" class="text-blue-500 hover:text-blue-600"><i class="fas fa-arrow-left mr-1"></i> 메인으로 돌아가기</a>
+    </div>
+
+    <div class="mt-8 text-center text-sm text-gray-500">
+      <a href="javascript:void(0);" id="buttonLogout">로그아웃</a>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/@simplewebauthn/browser@11.0.0/dist/bundle/index.es5.umd.min.js"></script>
+  <script>
+    const { startRegistration, startAuthentication } = SimpleWebAuthnBrowser;
+
+    const __page__ = {};
+
+    (async () => {
+      const myinfoResponse = await fetch('/myinfo');
+      if(myinfoResponse.status !== 200) {
+        window.location.href = '/';
+        return;
+      }
+
+      const myinfo = await myinfoResponse.json();
+      __page__.myinfo = myinfo;
+      console.log(JSON.stringify(myinfo));
+
+      document.getElementById('username').value = myinfo.username;
+      document.getElementById('nickname').value = myinfo.nickname;
+      document.getElementById('email').value = myinfo.email;
+
+      for(const oauthAccount of myinfo.oauthAccounts) {
+        if(oauthAccount.provider === 'google') {
+          __page__.googleId = oauthAccount.id;
+          document.getElementById('buttonGoogle').innerHTML = '<i class="fab fa-google text-red-500 text-lg mr-3"></i> Google 계정 연결 해제';
+        } else if(oauthAccount.provider === 'github') {
+          __page__.githubId = oauthAccount.id;
+          document.getElementById('buttonGithub').innerHTML = '<i class="fab fa-github text-gray-800 text-lg mr-3"></i> GitHub 계정 연결 해제';
+        }
+      }
+    })();
+
+    document.getElementById('buttonSave').addEventListener('click', async () => {
+      const username = document.getElementById('username').value;
+      const nickname = document.getElementById('nickname').value;
+      const email = document.getElementById('email').value;
+
+      const response = await fetch('/myinfo', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+        body: JSON.stringify({ username, nickname, email }),
+      });
+
+      if(response.status !== 200) {
+        alert('정보 수정에 실패했습니다.');
+        return;
+      }
+
+      alert('정보 수정에 성공했습니다.'); 
+    });
+
+    document.getElementById('buttonPasskey').addEventListener('click', async () => {
+      try {
+        const id = __page__.myinfo.id;
+        const registrationOptions = await fetch(`/registration-options?id=${id}`);
+        const registrationOptionsJSON = await registrationOptions.json();
+        const registrationParams = await startRegistration({ optionsJSON: registrationOptionsJSON });
+        console.log(JSON.stringify(registrationParams));
+
+        const registration = await fetch('/registration', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+          body: JSON.stringify(registrationParams),
+        });
+        const registrationJSON = await registration.json();
+        console.log(JSON.stringify(registrationJSON));
+      } catch(error) {
+        console.error(error);
+      }
+    });
+
+    document.getElementById('buttonGoogle').addEventListener('click', async () => {
+      if(!!__page__.googleId) {
+        window.location.href = `/google/disconnect`;
+      } else {
+        window.location.href = `/google/connect`;
+      }
+    });
+
+    document.getElementById('buttonGithub').addEventListener('click', async () => {
+      if(!!__page__.githubId) {
+        window.location.href = `/github/disconnect`;
+      } else {
+        window.location.href = `/github/connect`;
+      }
+    });
+
+    document.getElementById('buttonLogout').addEventListener('click', async () => {
+      document.cookie = 'jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      window.location.href = '/';
+    });
+  </script>
+</body>
+</html>

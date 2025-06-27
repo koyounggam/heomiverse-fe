@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="description" content="허미버스 로그인">
+  <link rel="icon" href="/icons/icon-32.png" sizes="32x32" />
+  <link rel="apple-touch-icon" href="/icons/icon-180.png" sizes="180x180" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>로그인 | 허미버스</title>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center">
+  <div class="w-full max-w-md p-8">
+    <div class="bg-white rounded-lg shadow-lg p-6">
+      <img src="https://heomiverse.com/icons/icon-128.png" style="margin: 0 auto;">
+
+      <form class="space-y-4">
+        <div>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+              <i class="fas fa-user"></i>
+            </span>
+            <input type="username" id="username" name="username" required
+              class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="사용자 이름, 이메일 또는 전화번호" />
+          </div>
+        </div>
+
+        <div>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+              <i class="fas fa-lock"></i>
+            </span>
+            <input type="password" id="password" name="password" required
+              class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="비밀번호" />
+          </div>
+        </div>
+
+        <button type="submit" id="buttonLogin"
+          class="w-full py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+          <i class="fa fa-sign-in"></i> 로그인
+        </button>
+      </form>
+
+      <div class="mt-6 text-center text-sm">
+        <p class="text-gray-600">
+          <a href="/password-reset.html" class="hover:text-blue-600 font-medium">비밀번호를 잊으셨나요?</a>
+        </p>
+      </div>
+
+      <div class="mt-6">
+        <div class="relative">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-gray-300"></div>
+          </div>
+          <div class="relative flex justify-center text-sm">
+            <span class="px-2 bg-white text-gray-500">간편 로그인</span>
+          </div>
+        </div>
+
+        <div class="mt-6 space-y-3">
+          <button type="button" id="buttonPasskey"
+            class="w-full inline-flex justify-center items-center py-2.5 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <i class="fas fa-fingerprint text-blue-500 text-lg mr-3"></i> 패스키로 로그인
+          </button>
+          <button type="button" id="buttonGoogle"
+            class="w-full inline-flex justify-center items-center py-2.5 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <i class="fab fa-google text-red-500 text-lg mr-3"></i> Google 계정으로 로그인
+          </button>
+          <button type="button" id="buttonGithub"
+            class="w-full inline-flex justify-center items-center py-2.5 px-4 border border-gray-300 rounded-md shadow-sm bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+            <i class="fab fa-github text-gray-800 text-lg mr-3"></i> GitHub 계정으로 로그인
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-6 text-center text-sm">
+      <p class="text-gray-600">
+        계정이 없으신가요?
+        <a href="/signup.html" class="text-blue-500 hover:text-blue-600 font-medium">계정 생성</a>
+      </p>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/@simplewebauthn/browser@11.0.0/dist/bundle/index.es5.umd.min.js"></script>
+  <script>
+    const { startAuthentication } = SimpleWebAuthnBrowser;
+
+    document.getElementById('buttonLogin').addEventListener('click', async (e) => {
+      try {
+        e.preventDefault();
+
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        const response = await fetch('/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+
+        window.location.href = '/';
+      } catch(error) {
+        console.error(error);
+      }
+    });
+
+    document.getElementById('buttonPasskey').addEventListener('click', async () => {
+      try {
+        const authenticationOptions = await fetch('/authentication-options');
+        const authenticationOptionsJSON = await authenticationOptions.json();
+
+        const authenticationParams = await startAuthentication({ optionsJSON: authenticationOptionsJSON, useAutofill: true });
+        const authentication = await fetch('/authentication', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(authenticationParams),
+        });
+        const authenticationJSON = await authentication.json();
+
+        window.location.href = '/';
+      } catch(error) {
+        console.error(error);
+      }
+    });
+
+    document.getElementById('buttonGoogle').addEventListener('click', async () => {
+      window.location.href = '/google/login';
+    });
+
+    document.getElementById('buttonGithub').addEventListener('click', async () => {
+      window.location.href = '/github/login';
+    });
+  </script>
+</body>
+</html>
