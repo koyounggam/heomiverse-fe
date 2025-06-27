@@ -65,7 +65,7 @@ function App() {
     const currentViews = dailyViews + 1
     
     if (currentViews > DAILY_LIMIT) {
-      await showModal('오늘은 더 이상 볼 수 없어요. 내일 다시 와주세요!', 'info')
+      await showModal('오늘은 더 이상 볼 수 없어요 😥 내일 다시 와주세요!', 'info')
       return
     }
 
