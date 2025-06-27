@@ -109,11 +109,11 @@
 
     document.getElementById('buttonPasskey').addEventListener('click', async () => {
       try {
-        const authenticationOptions = await fetch('/authentication-options');
+        const authenticationOptions = await fetch('/fido/authentication-options');
         const authenticationOptionsJSON = await authenticationOptions.json();
 
         const authenticationParams = await startAuthentication({ optionsJSON: authenticationOptionsJSON, useAutofill: true });
-        const authentication = await fetch('/authentication', {
+        const authentication = await fetch('/fido/authentication', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(authenticationParams),

@@ -149,12 +149,12 @@
     document.getElementById('buttonPasskey').addEventListener('click', async () => {
       try {
         const id = __page__.myinfo.id;
-        const registrationOptions = await fetch(`/registration-options?id=${id}`);
+        const registrationOptions = await fetch(`/fido/registration-options?id=${id}`);
         const registrationOptionsJSON = await registrationOptions.json();
         const registrationParams = await startRegistration({ optionsJSON: registrationOptionsJSON });
         console.log(JSON.stringify(registrationParams));
 
-        const registration = await fetch('/registration', {
+        const registration = await fetch('/fido/registration', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json;charset=UTF-8' },
           body: JSON.stringify(registrationParams),
