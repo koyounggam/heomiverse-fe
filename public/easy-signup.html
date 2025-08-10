@@ -101,6 +101,15 @@
   </div>
 
   <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const response = await fetch('/random-nickname', {
+        method: 'GET',
+      });
+      const data = await response.json();
+      document.getElementById('nickname').value = data.nickname;
+      document.getElementById('nickname').focus();
+    });
+
     document.getElementById('buttonSignup').addEventListener('click', async (e) => {
       e.preventDefault();
 
