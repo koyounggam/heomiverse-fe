@@ -119,7 +119,7 @@
       await fetch('/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, nickname, email, password })
+        body: JSON.stringify({ nickname })
       });
 
       await showModal('회원가입이 완료되었습니다.', 'success');
