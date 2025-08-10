@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="description" content="허미버스 회원가입">
+  <link rel="icon" href="/icons/icon-32.png" sizes="32x32" />
+  <link rel="apple-touch-icon" href="/icons/icon-180.png" sizes="180x180" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <title>회원 가입 | 허미버스</title>
+  <style>
+    .modal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 999;
+    }
+    .modal-title {
+      font-size: 20px;
+      font-weight: bold;
+    }
+    .modal-message {
+      font-size: 16px;
+    }
+    .modal-button {
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+    }
+    .modal-button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center">
+  <div class="w-full max-w-md p-8">
+    <div class="bg-white rounded-lg shadow-lg p-6">
+      <h2 class="text-xl font-bold text-center mb-6">회원 가입</h2>
+      
+      <form id="signupForm" class="space-y-4">
+        <div>
+          <label for="nickname" class="block text-sm font-medium text-gray-700 mb-1">별명</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400">
+              <i class="fas fa-tag"></i>
+            </span>
+            <input type="text" id="nickname" name="nickname" required
+              class="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              placeholder="별명을 입력하세요" />
+          </div>
+        </div>
+
+        <div class="flex items-start">
+          <div class="flex items-center h-5">
+            <input id="terms" name="terms" type="checkbox" required
+              class="h-4 w-4 rounded border-gray-300 text-blue-500 focus:ring-blue-500" />
+          </div>
+          <div class="ml-3 text-sm">
+            <label for="terms" class="text-gray-600">
+              <a href="/privacy.html" target="_blank" class="text-blue-500 hover:text-blue-600">개인정보처리방침</a>에 동의합니다
+            </label>
+          </div>
+        </div>
+
+        <button type="button" id="buttonSignup" class="w-full py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+          <i class="fas fa-user-plus mr-2"></i> 회원 가입
+        </button>
+      </form>
+
+      <div class="mt-6 text-center text-sm">
+        <p class="text-gray-600">
+          이미 계정이 있으신가요?
+          <a href="/login.html" class="text-blue-500 hover:text-blue-600 font-medium">로그인</a>
+        </p>
+      </div>
+    </div>
+
+    <div class="mt-8 text-center text-sm text-gray-500">
+      <a href="/" class="text-blue-500 hover:text-blue-600">
+        <i class="fas fa-arrow-left mr-1"></i> 메인으로 돌아가기
+      </a>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('buttonSignup').addEventListener('click', async (e) => {
+      e.preventDefault();
+
+      const nickname = document.getElementById('nickname').value;
+      if(!nickname) {
+        alert('별명을 입력해주세요.');
+        return;
+      }
+
+      const terms = document.getElementById('terms').checked;
+      if(!terms) {
+        alert('개인정보처리방침에 동의해주세요.');
+        return;
+      }
+
+      await fetch('/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, nickname, email, password })
+      });
+
+      await showModal('회원가입이 완료되었습니다.', 'success');
+
+      window.location.href = '/login.html';
+    });
+
+    // dimmer 추가
+    const showModal = (message, type) => {
+      return new Promise((resolve) => {
+        const overlay = document.createElement('div');
+        overlay.classList.add('modal-overlay');
+        document.body.appendChild(overlay);
+
+        const modal = document.createElement('div');
+        modal.classList.add('modal');
+        modal.innerHTML = message;
+        document.body.appendChild(modal);
+
+        const button = document.createElement('button');
+        button.classList.add('modal-button');
+        button.innerHTML = '확인';
+        button.addEventListener('click', () => {
+          document.body.removeChild(overlay);
+          document.body.removeChild(modal);
+          resolve();
+        });
+        modal.appendChild(button);
+      });
+    };
+
+    const hideModal = () => {
+      const modal = document.querySelector('.modal');
+      const overlay = document.querySelector('.modal-overlay');
+      if(modal) {
+        document.body.removeChild(modal);
+      }
+      if(overlay) {
+        document.body.removeChild(overlay);
+      }
+    };
+  </script>
+</body>
+</html>
